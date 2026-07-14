@@ -1,6 +1,4 @@
 # Portfolio
-Personal portfolio website showcasing my engineering journey, projects, writing, and contact links.
-
 This repository contains my personal portfolio website.
 
 It is built to showcase my engineering journey, selected projects, technical writing, and ways to connect with me.
