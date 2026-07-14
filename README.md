@@ -1,4 +1,4 @@
-# portfolio
+# Portfolio
 Personal portfolio website showcasing my engineering journey, projects, writing, and contact links.
 
 This repository contains my personal portfolio website.
