@@ -18,7 +18,7 @@ export const profile = {
     "Creating strong public proof through projects and writing",
   ],
   github: "https://github.com/nisanth-alla",
-  linkedin: "https://www.linkedin.com/in/nisanth-sai-a-85a762244/",
+  linkedin: "https://www.linkedin.com/in/nisanth-alla/",
   email: "nisanth.alla@gmail.com",
   emailLink: "mailto:nisanth.alla@gmail.com",
   resume: "/resume.pdf",
