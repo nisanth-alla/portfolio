@@ -3,7 +3,9 @@
 Personal portfolio site: a single-page narrative of my engineering journey, work, research, and how to reach me. Built for clarity and performance—content lives in TypeScript modules, UI in small section components, minimal client JavaScript.
 
 **Repository:** [github.com/nisanth-alla/portfolio](https://github.com/nisanth-alla/portfolio)  
-**Live site:** _https://portfolio-ulzg.vercel.app/_
+**Live site:** [nisanth-alla/portfolio](https://portfolio-ulzg.vercel.app/)
+
+![Portfolio preview](./public/portfolio-preview.png)
 
 ## Highlights
 
@@ -21,7 +23,7 @@ Personal portfolio site: a single-page narrative of my engineering journey, work
 | **About** | Bio, location, engineering philosophy |
 | **Current Focus** | What I'm learning and building now |
 | **Featured Projects** | Selected repos with stack and links |
-| **Research & Publications** | Papers and research (including M.Tech work) |
+| **Research & Publications** | Published work and graduate research |
 | **Education** | Degrees and context |
 | **Recognition** | Awards and stakeholder recognition |
 | **Technical Writing** | Notes and explainers |
