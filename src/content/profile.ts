@@ -22,4 +22,10 @@ export const profile = {
   email: "nisanth.alla@gmail.com",
   emailLink: "mailto:nisanth.alla@gmail.com",
   resume: "/resume.pdf",
+  now: "Building full-stack features, studying system design, and documenting what I learn in public repos.",
+  highlights: [
+    { label: "Primary stack", value: "React · TypeScript · Node.js" },
+    { label: "Growing into", value: "Cloud · distributed systems · backend design" },
+    { label: "Location", value: "Hyderabad, Telangana, India" },
+  ],
 };

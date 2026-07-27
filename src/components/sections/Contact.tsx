@@ -1,33 +1,35 @@
+import { CopyEmailButton } from "@/components/CopyEmailButton";
+import { SectionHeading } from "@/components/SectionHeading";
+import { SectionShell } from "@/components/SectionShell";
 import { profile } from "@/content/profile";
 
 export function Contact() {
   return (
-    <section
-      id="contact"
-      className="mx-auto w-full max-w-5xl scroll-mt-24 border-t border-slate-200 px-6 py-14"
-    >
-      <div className="max-w-2xl">
-        <h2 className="text-2xl font-semibold tracking-tight">Contact</h2>
-        <p className="mt-4 text-base text-slate-600">
+    <SectionShell id="contact">
+      <div className="card-surface max-w-2xl p-8">
+        <SectionHeading
+          index="09"
+          title="Contact"
+          subtitle="Open to thoughtful conversations about engineering work, collaboration, and learning."
+        />
+        <p className="mt-4 text-base leading-7 text-muted-foreground">
           Reach me via{" "}
           <a
             href={profile.linkedin}
             target="_blank"
-            rel="noreferrer"
-            className="font-medium text-slate-900 underline underline-offset-4"
+            rel="noopener noreferrer"
+            className="link-accent"
           >
             LinkedIn
           </a>{" "}
           or email at{" "}
-          <a
-            href={profile.emailLink}
-            className="font-medium text-slate-900 underline underline-offset-4"
-          >
+          <a href={profile.emailLink} className="link-accent">
             {profile.email}
           </a>
           .
         </p>
+        <CopyEmailButton />
       </div>
-    </section>
+    </SectionShell>
   );
 }

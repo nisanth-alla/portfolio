@@ -1,32 +1,27 @@
+import { SectionHeading } from "@/components/SectionHeading";
+import { SectionShell } from "@/components/SectionShell";
 import { about } from "@/content/about";
 import { profile } from "@/content/profile";
 
 export function About() {
   return (
-    <section
-      id="about"
-      className="mx-auto w-full max-w-5xl scroll-mt-24 border-t border-slate-200 px-6 py-14"
-    >
+    <SectionShell id="about">
       <div className="grid gap-10 md:grid-cols-2">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">About</h2>
-          <p className="mt-4 text-base leading-7 text-slate-600">
-            {about.bio}
-          </p>
-          <p className="mt-4 text-sm text-slate-500">
+          <SectionHeading index="01" title="About" />
+          <p className="mt-4 text-base leading-7 text-muted-foreground">{about.bio}</p>
+          <p className="mt-4 text-sm text-muted-foreground">
             Based in {profile.location}.
           </p>
         </div>
 
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Engineering Philosophy
-          </h2>
-          <p className="mt-4 text-base leading-7 text-slate-600">
+        <div className="card-surface p-6 md:p-8">
+          <SectionHeading title="Engineering Philosophy" />
+          <p className="mt-4 text-base leading-7 text-muted-foreground">
             {about.philosophy}
           </p>
         </div>
       </div>
-    </section>
+    </SectionShell>
   );
 }

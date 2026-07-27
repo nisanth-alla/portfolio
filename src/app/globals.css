@@ -1,16 +1,191 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-fg);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-foreground: var(--accent-fg);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --muted: #f1f5f9;
+  --muted-fg: #64748b;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --accent: #6366f1;
+  --accent-secondary: #0ea5e9;
+  --accent-fg: #ffffff;
+  --grid-dot: #cbd5e1;
   color-scheme: light;
+}
+
+.dark {
+  --bg: #030712;
+  --fg: #f8fafc;
+  --muted: #111827;
+  --muted-fg: #94a3b8;
+  --border: #1e293b;
+  --card: #0f172a;
+  --accent: #818cf8;
+  --accent-secondary: #38bdf8;
+  --accent-fg: #0f172a;
+  --grid-dot: #1e293b;
+  color-scheme: dark;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
-  background: #ffffff;
-  color: #0f172a;
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+  color: var(--fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.card-surface {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--fg) 4%, transparent);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card-surface:hover {
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--border));
+  box-shadow: 0 8px 30px color-mix(in oklab, var(--fg) 6%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-surface {
+    transition: none;
+  }
+  .card-surface:hover {
+    transform: none;
+  }
+}
+
+.btn-primary {
+  border-radius: 9999px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-secondary {
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 80%, transparent);
+  color: var(--fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: color-mix(in oklab, var(--fg) 25%, var(--border));
+  background: var(--muted);
+}
+
+.link-accent {
+  color: var(--fg);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+}
+
+.link-accent:hover {
+  text-decoration-color: var(--accent);
+}
+
+.scroll-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.scroll-reveal[data-reveal="true"]:not([data-visible="true"]) {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+.scroll-reveal[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  border-radius: 9999px;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transform: translateY(-200%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.section-muted {
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal[data-reveal="true"]:not([data-visible="true"]) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

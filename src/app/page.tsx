@@ -13,7 +13,10 @@ import { Writing } from "@/components/sections/Writing";
 
 export default function Home() {
   return (
-    <main id="top" className="min-h-screen bg-white text-slate-900">
+    <main
+      id="main-content"
+      className="relative min-h-screen pb-20 text-foreground"
+    >
       <Nav />
       <Hero />
       <EngineeringJourney />
