@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { profile } from "@/content/profile";
 
 const items = [
   { label: "About", href: "#about", id: "about" },
+  { label: "Journey", href: "#journey", id: "journey" },
   { label: "Projects", href: "#projects", id: "projects" },
   { label: "Research", href: "#research", id: "research" },
-  { label: "Education", href: "#education", id: "education" },
+  { label: "Writing", href: "#writing", id: "writing" },
   { label: "Contact", href: "#contact", id: "contact" },
 ];
 
@@ -25,8 +27,8 @@ function NavLinks({ active }: { active: string | null }) {
               className={
                 "block whitespace-nowrap border-b-2 pb-1 transition " +
                 (isActive
-                  ? "border-slate-900 font-medium text-slate-900"
-                  : "border-transparent text-slate-600 hover:text-slate-900")
+                  ? "border-foreground font-medium text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground")
               }
             >
               {item.label}
@@ -84,20 +86,26 @@ export function Nav() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/80 backdrop-blur">
+    <nav
+      aria-label="Primary"
+      className="sticky top-0 z-40 border-b border-border/70 bg-background/75 backdrop-blur-md"
+    >
       <div className="mx-auto w-full max-w-5xl px-6 py-3 md:py-4">
-        <div className="flex items-center justify-between gap-6">
+        <div className="flex items-center justify-between gap-4">
           <a
-            href="#top"
-            className="text-sm font-semibold tracking-tight text-slate-900"
+            href="#main-content"
+            className="text-sm font-semibold tracking-tight text-foreground"
           >
             {profile.name}
           </a>
-          <ul className="hidden items-center gap-x-6 text-sm md:flex">
-            <NavLinks active={active} />
-          </ul>
+          <div className="flex items-center gap-3 md:gap-4">
+            <ul className="hidden items-center gap-x-5 text-sm lg:flex">
+              <NavLinks active={active} />
+            </ul>
+            <ThemeToggle />
+          </div>
         </div>
-        <ul className="mt-2 flex gap-x-6 overflow-x-auto text-sm md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="mt-2 flex gap-x-5 overflow-x-auto text-sm lg:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <NavLinks active={active} />
         </ul>
       </div>

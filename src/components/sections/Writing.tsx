@@ -1,30 +1,33 @@
+import { SectionHeading } from "@/components/SectionHeading";
+import { SectionShell } from "@/components/SectionShell";
 import { writing } from "@/content/writing";
 
 export function Writing() {
   return (
-    <section className="mx-auto w-full max-w-5xl border-t border-slate-200 px-6 py-14">
-      <div className="max-w-2xl">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Technical Writing
-        </h2>
-        <p className="mt-3 text-base text-slate-600">
-          Short technical notes and explainers from my learning journey.
-        </p>
-      </div>
+    <SectionShell id="writing" tone="muted">
+      <SectionHeading
+        index="08"
+        title="Technical Writing"
+        subtitle="Short technical notes and explainers from my learning journey."
+      />
 
       <div className="mt-8 space-y-4">
         {writing.map((item) => (
-          <article
-            key={item.title}
-            className="rounded-2xl border border-slate-200 p-6"
-          >
-            <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
+          <article key={item.title} className="card-surface p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
+              {item.status === "draft" ? (
+                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                  In progress
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
               {item.description}
             </p>
           </article>
         ))}
       </div>
-    </section>
+    </SectionShell>
   );
 }

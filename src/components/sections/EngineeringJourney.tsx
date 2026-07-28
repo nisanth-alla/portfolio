@@ -1,20 +1,22 @@
+import { SectionHeading } from "@/components/SectionHeading";
+import { SectionShell } from "@/components/SectionShell";
 import { journey, type Milestone } from "@/content/journey";
 
 export function EngineeringJourney() {
   return (
-    <section className="mx-auto w-full max-w-5xl border-t border-slate-200 px-6 py-14">
-      <div className="max-w-2xl">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          Engineering Journey
-        </h2>
-      </div>
+    <SectionShell id="journey" tone="muted">
+      <SectionHeading
+        index="02"
+        title="Engineering Journey"
+        subtitle="A concise timeline of how my work and learning have evolved."
+      />
 
-      <ol className="relative mt-10 max-w-2xl border-l border-slate-200">
+      <ol className="relative mt-10 max-w-2xl border-l border-border">
         {journey.map((milestone) => (
           <MilestoneItem key={milestone.year} milestone={milestone} />
         ))}
       </ol>
-    </section>
+    </SectionShell>
   );
 }
 
@@ -27,15 +29,17 @@ function MilestoneItem({ milestone }: { milestone: Milestone }) {
         aria-hidden="true"
         className={
           "absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full " +
-          (isFuture ? "border-2 border-slate-900 bg-white" : "bg-slate-900")
+          (isFuture
+            ? "border-2 border-foreground bg-background"
+            : "bg-foreground")
         }
       />
 
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {milestone.year}
       </p>
 
-      <p className="mt-2 text-base leading-7 text-slate-700">
+      <p className="mt-2 text-base leading-7 text-foreground/90">
         {milestone.description}
       </p>
     </li>
