@@ -36,6 +36,18 @@ export const projects = [
     ],
   },
   {
+    name: "Visual Retail Discovery",
+    description:
+      "A fashion discovery application combining visual search, semantic catalogue search, outfit recommendations, and an AI stylist in a single Java service.",
+    stack: ["Java", "Spring Boot", "React", "TypeScript", "Computer Vision"],
+    github: "https://github.com/nisanth-alla/retail-discovery",
+    live: "https://retail-discovery.onrender.com/",
+    points: [
+      "Uses image embeddings, ONNX models, and a local vector index to find related products.",
+      "Serves the React frontend and API from one container with configurable Groq and Anthropic chat providers.",
+    ],
+  },
+  {
     name: "Portfolio",
     description:
       "A clean personal portfolio built with Next.js to showcase my engineering journey, projects, and writing.",
