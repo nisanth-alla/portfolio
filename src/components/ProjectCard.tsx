@@ -1,3 +1,7 @@
+import { ArrowUpRight } from "lucide-react";
+
+import { GithubIcon } from "@/components/BrandIcons";
+
 type ProjectCardProps = {
   name: string;
   description: string;
@@ -50,14 +54,21 @@ export function ProjectCard({
             href={github}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-accent"
+            className="inline-flex items-center gap-1.5 text-muted-foreground transition hover:text-foreground"
           >
-            GitHub
+            <GithubIcon className="h-4 w-4" />
+            Source
           </a>
         ) : null}
         {live ? (
-          <a href={live} target="_blank" rel="noopener noreferrer" className="link-accent">
+          <a
+            href={live}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-muted-foreground transition hover:text-foreground"
+          >
             Live
+            <ArrowUpRight className="h-4 w-4" />
           </a>
         ) : null}
       </div>

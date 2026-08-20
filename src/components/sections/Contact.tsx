@@ -1,3 +1,6 @@
+import { Mail } from "lucide-react";
+
+import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
 import { CopyEmailButton } from "@/components/CopyEmailButton";
 import { SectionHeading } from "@/components/SectionHeading";
 import { SectionShell } from "@/components/SectionShell";
@@ -8,27 +11,59 @@ export function Contact() {
     <SectionShell id="contact">
       <div className="card-surface max-w-2xl p-8">
         <SectionHeading
-          index="09"
+          index="10"
           title="Contact"
           subtitle="Open to thoughtful conversations about engineering work, collaboration, and learning."
         />
-        <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Reach me via{" "}
+
+        <div className="mt-6 flex flex-col gap-3">
           <a
             href={profile.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-accent"
+            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
           >
-            LinkedIn
-          </a>{" "}
-          or email at{" "}
-          <a href={profile.emailLink} className="link-accent">
-            {profile.email}
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <LinkedinIcon className="h-4 w-4 text-foreground" />
+            </span>
+            <span className="font-medium text-foreground">LinkedIn</span>
+            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
+              {profile.linkedin.replace("https://www.", "").replace(/\/$/, "")}
+            </span>
           </a>
-          .
-        </p>
-        <CopyEmailButton />
+
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <GithubIcon className="h-4 w-4 text-foreground" />
+            </span>
+            <span className="font-medium text-foreground">GitHub</span>
+            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
+              {profile.github.replace("https://", "").replace(/\/$/, "")}
+            </span>
+          </a>
+
+          <a
+            href={profile.emailLink}
+            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <Mail className="h-4 w-4 text-foreground" />
+            </span>
+            <span className="font-medium text-foreground">Email</span>
+            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
+              {profile.email}
+            </span>
+          </a>
+        </div>
+
+        <div className="mt-6">
+          <CopyEmailButton />
+        </div>
       </div>
     </SectionShell>
   );

@@ -1,3 +1,6 @@
+import { FileText } from "lucide-react";
+
+import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { profile } from "@/content/profile";
 
@@ -40,24 +43,27 @@ export function Hero() {
                 href={profile.resume}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
+                className="btn-primary inline-flex items-center gap-2"
               >
+                <FileText className="h-4 w-4" />
                 Resume
               </a>
               <a
                 href={profile.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-secondary"
+                className="btn-secondary inline-flex items-center gap-2"
               >
+                <GithubIcon className="h-4 w-4" />
                 GitHub
               </a>
               <a
                 href={profile.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-secondary"
+                className="btn-secondary inline-flex items-center gap-2"
               >
+                <LinkedinIcon className="h-4 w-4" />
                 LinkedIn
               </a>
             </div>
