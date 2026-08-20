@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { profile } from "@/content/profile";
 
@@ -9,6 +10,7 @@ const items = [
   { label: "About", href: "#about", id: "about" },
   { label: "Journey", href: "#journey", id: "journey" },
   { label: "Projects", href: "#projects", id: "projects" },
+  { label: "GitHub", href: "#github", id: "github" },
   { label: "Research", href: "#research", id: "research" },
   { label: "Writing", href: "#writing", id: "writing" },
   { label: "Contact", href: "#contact", id: "contact" },
@@ -102,7 +104,27 @@ export function Nav() {
             <ul className="hidden items-center gap-x-5 text-sm lg:flex">
               <NavLinks active={active} />
             </ul>
-            <ThemeToggle />
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <a
+                href={profile.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="rounded-md p-2 text-muted-foreground transition hover:text-foreground"
+              >
+                <GithubIcon className="h-4 w-4" />
+              </a>
+              <a
+                href={profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="rounded-md p-2 text-muted-foreground transition hover:text-foreground"
+              >
+                <LinkedinIcon className="h-4 w-4" />
+              </a>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
         <ul className="mt-2 flex gap-x-5 overflow-x-auto text-sm lg:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

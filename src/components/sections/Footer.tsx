@@ -1,3 +1,4 @@
+import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
 import { profile } from "@/content/profile";
 
 export function Footer() {
@@ -14,23 +15,24 @@ export function Footer() {
             Built with Next.js, TypeScript, and Tailwind CSS.
           </p>
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-accent"
+            aria-label="GitHub"
+            className="rounded-md p-1.5 transition hover:text-foreground"
           >
-            GitHub
+            <GithubIcon className="h-4 w-4" />
           </a>
-          {" · "}
           <a
             href={profile.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-accent"
+            aria-label="LinkedIn"
+            className="rounded-md p-1.5 transition hover:text-foreground"
           >
-            LinkedIn
+            <LinkedinIcon className="h-4 w-4" />
           </a>
         </div>
       </div>

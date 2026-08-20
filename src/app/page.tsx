@@ -5,6 +5,7 @@ import { CurrentFocus } from "@/components/sections/CurrentFocus";
 import { Education } from "@/components/sections/Education";
 import { EngineeringJourney } from "@/components/sections/EngineeringJourney";
 import { Footer } from "@/components/sections/Footer";
+import { GitHubActivity } from "@/components/sections/GitHubActivity";
 import { Hero } from "@/components/sections/Hero";
 import { Projects } from "@/components/sections/Projects";
 import { Publications } from "@/components/sections/Publications";
@@ -23,6 +24,7 @@ export default function Home() {
       <About />
       <CurrentFocus />
       <Projects />
+      <GitHubActivity />
       <Publications />
       <Education />
       <Recognition />
