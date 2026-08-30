@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { GithubIcon } from "@/components/BrandIcons";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -25,8 +26,9 @@ type LatestCommit = {
 type TooltipState = {
   date: string;
   count: number;
-  x: number;
-  y: number;
+  // Viewport-relative coords (for position:fixed — escapes all overflow clipping)
+  cx: number; // centre-x of the hovered cell
+  cy: number; // top-y of the hovered cell
 } | null;
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -132,6 +134,52 @@ function buildMonthPositions(weeks: Cell[][]): { label: string; left: number }[]
   return positions;
 }
 
+// ─── Tooltip portal ───────────────────────────────────────────────────────────
+// Renders into document.body via createPortal so it is never clipped by any
+// overflow:hidden/auto ancestor. Flips below the cell when near the top of the
+// viewport, and clamps horizontally so it never escapes the screen edge.
+
+const TOOLTIP_HEIGHT = 36; // px — approximate tooltip height
+const TOOLTIP_GAP    = 6;  // px — gap between cell and tooltip
+const EDGE_PAD       = 8;  // px — min distance from viewport edges
+
+function TooltipPortal({
+  cx, cy, count, label,
+}: {
+  cx: number;
+  cy: number;
+  count: number;
+  label: string;
+}) {
+  // Flip below if not enough room above
+  const showBelow = cy - TOOLTIP_HEIGHT - TOOLTIP_GAP < EDGE_PAD;
+  const top = showBelow
+    ? cy + CELL + TOOLTIP_GAP          // below the cell
+    : cy - TOOLTIP_HEIGHT - TOOLTIP_GAP; // above the cell
+
+  // Clamp horizontally within viewport
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
+  // Estimate tooltip width (characters × ~7px + padding)
+  const estWidth = Math.min((label.length + String(count).length + 20) * 7, 320);
+  const left = Math.max(
+    EDGE_PAD,
+    Math.min(cx - estWidth / 2, vw - estWidth - EDGE_PAD),
+  );
+
+  return createPortal(
+    <div
+      className="pointer-events-none fixed z-[9999] whitespace-nowrap rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs shadow-lg"
+      style={{ top, left }}
+    >
+      <span className="font-medium text-foreground">
+        {count} contribution{count !== 1 ? "s" : ""}
+      </span>
+      <span className="ml-1.5 text-muted-foreground">{label}</span>
+    </div>,
+    document.body,
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function GitHubActivity() {
@@ -210,13 +258,12 @@ export function GitHubActivity() {
     cell: Contribution,
   ) {
     const rect = e.currentTarget.getBoundingClientRect();
-    const gridRect = gridRef.current?.getBoundingClientRect();
-    if (!gridRect) return;
     setTooltip({
       date: cell.date,
       count: cell.count,
-      x: rect.left - gridRect.left + CELL / 2,
-      y: rect.top - gridRect.top,
+      // Viewport-relative: used with position:fixed so no parent clips it
+      cx: rect.left + CELL / 2,
+      cy: rect.top,
     });
   }
 
@@ -314,28 +361,12 @@ export function GitHubActivity() {
             </div>
           ) : (
             <div>
-              {/* Month label row — absolutely positioned over the grid */}
-              <div
-                className="relative mb-1.5 h-4"
-                style={{ width: gridWidth, minWidth: gridWidth }}
-              >
-                {monthPositions.map((m) => (
-                  <span
-                    key={m.label + m.left}
-                    className="absolute text-[10px] text-muted-foreground"
-                    style={{ left: m.left }}
-                  >
-                    {m.label}
-                  </span>
-                ))}
-              </div>
-
-              {/* Day labels + grid */}
+              {/* Day labels + grid (month labels sit inside this row, aligned to grid) */}
               <div className="flex gap-[3px]">
-                {/* Day-of-week axis */}
+                {/* Day-of-week axis — same width as below so months align */}
                 <div
                   className="flex shrink-0 flex-col gap-[3px] pr-1.5"
-                  style={{ paddingTop: 0 }}
+                  style={{ paddingTop: CELL + 6 }} /* push day labels down past month row */
                 >
                   {DAY_LABELS.map((label, idx) => (
                     <div
@@ -347,6 +378,24 @@ export function GitHubActivity() {
                     </div>
                   ))}
                 </div>
+
+                {/* Grid column: month labels on top, cells below */}
+                <div className="flex flex-col gap-[3px]">
+                  {/* Month label row — left values are col × PITCH, matching cells exactly */}
+                  <div
+                    className="relative h-4 shrink-0"
+                    style={{ width: gridWidth, minWidth: gridWidth }}
+                  >
+                    {monthPositions.map((m) => (
+                      <span
+                        key={m.label + m.left}
+                        className="absolute text-[10px] text-muted-foreground"
+                        style={{ left: m.left }}
+                      >
+                        {m.label}
+                      </span>
+                    ))}
+                  </div>
 
                 {/* Heatmap grid — relatively positioned for tooltip anchor */}
                 <div
@@ -376,26 +425,19 @@ export function GitHubActivity() {
                     })
                   )}
 
-                  {/* Tooltip */}
+                  {/* Tooltip — rendered via portal-like fixed positioning so it
+                      escapes overflow:hidden/auto on every ancestor */}
                   {tooltip && (
-                    <div
-                      className="pointer-events-none absolute z-10 whitespace-nowrap rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs shadow-md"
-                      style={{
-                        left: tooltip.x,
-                        top: tooltip.y - 44,
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      <span className="font-medium text-foreground">
-                        {tooltip.count} contribution{tooltip.count !== 1 ? "s" : ""}
-                      </span>
-                      <span className="ml-1.5 text-muted-foreground">
-                        {formatTooltipDate(tooltip.date)}
-                      </span>
-                    </div>
+                    <TooltipPortal
+                      cx={tooltip.cx}
+                      cy={tooltip.cy}
+                      count={tooltip.count}
+                      label={formatTooltipDate(tooltip.date)}
+                    />
                   )}
                 </div>
-              </div>
+                </div> {/* end flex-col grid+months wrapper */}
+              </div> {/* end flex row (day-labels + grid) */}
 
               {/* Legend */}
               <div className="mt-3 flex items-center justify-end gap-1.5 text-[10px] text-muted-foreground">
