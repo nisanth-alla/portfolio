@@ -1,22 +1,15 @@
 export const runtime = "nodejs";
-export const revalidate = 300; // 5 minutes
+export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 type GHEvent = {
   type: string;
   repo: { name: string };
-  payload: {
-    commits?: { message: string }[];
-    ref?: string;
-  };
+  payload: { commits?: { message: string }[] };
   created_at: string;
 };
 
-type LatestCommit = {
-  message: string;
-  repo: string;
-  ago: string;
-  url: string;
-};
+type LatestCommit = { message: string; repo: string; ago: string; url: string };
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -29,20 +22,23 @@ function timeAgo(iso: string): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, rej) =>
+      setTimeout(() => rej(new Error(`Timeout after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
 export async function GET() {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-
-    const res = await fetch(
-      "https://api.github.com/users/nisanth-alla/events/public?per_page=30",
-      {
-        signal: controller.signal,
+    const res = await withTimeout(
+      fetch("https://api.github.com/users/nisanth-alla/events/public?per_page=30", {
         headers: { "User-Agent": "portfolio-nisanth-alla" },
-        next: { revalidate: 300 },
-      },
+      }),
+      4000,
     );
-    clearTimeout(timeout);
 
     if (!res.ok) {
       return Response.json({ error: "GitHub API error" }, { status: 502 });
@@ -50,30 +46,32 @@ export async function GET() {
 
     const events = (await res.json()) as GHEvent[];
 
-    const pushEvent = events.find(
-      (e) =>
-        e.type === "PushEvent" &&
-        Array.isArray(e.payload.commits) &&
-        e.payload.commits.length > 0,
-    );
+    // GitHub redacts commit messages for unauthenticated requests.
+    // Fall back to the most recent PushEvent regardless of commits payload.
+    const push = events.find((e) => e.type === "PushEvent");
 
-    if (!pushEvent) {
-      return Response.json({ error: "No recent commits" }, { status: 404 });
+    if (!push) {
+      return Response.json({ error: "No recent push events" }, { status: 404 });
     }
 
-    const message =
-      pushEvent.payload.commits?.[0]?.message?.split("\n")[0] ?? "";
-    const repoName = pushEvent.repo.name.replace("nisanth-alla/", "");
+    // Use commit message if available, otherwise omit it
+    const rawMsg = push.payload.commits?.[0]?.message?.split("\n")[0] ?? "";
+    const message = rawMsg.length > 72 ? rawMsg.slice(0, 72) + "…" : rawMsg;
+
+    // Strip org prefix so both nisanth-alla/foo and foxpilot-jobs/foxpilot look clean
+    const repo = push.repo.name.includes("/")
+      ? push.repo.name.split("/").slice(-1)[0]
+      : push.repo.name;
 
     const commit: LatestCommit = {
-      message: message.length > 72 ? message.slice(0, 72) + "…" : message,
-      repo: repoName,
-      ago: timeAgo(pushEvent.created_at),
-      url: `https://github.com/${pushEvent.repo.name}`,
+      message,
+      repo,
+      ago: timeAgo(push.created_at),
+      url: `https://github.com/${push.repo.name}`,
     };
 
     return Response.json(commit);
   } catch {
-    return Response.json({ error: "Failed to fetch" }, { status: 502 });
+    return Response.json({ error: "Unavailable" }, { status: 502 });
   }
 }

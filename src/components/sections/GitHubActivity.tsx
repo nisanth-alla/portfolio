@@ -431,8 +431,12 @@ export function GitHubActivity() {
                 title={commit.message}
               >
                 <span className="text-accent font-mono">{commit.repo}</span>
-                <span className="mx-1">—</span>
-                <span>{commit.message}</span>
+                {commit.message && (
+                  <>
+                    <span className="mx-1">—</span>
+                    <span>{commit.message}</span>
+                  </>
+                )}
               </a>
             ) : (
               <span className="italic opacity-50">loading…</span>

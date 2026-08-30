@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AmbientBackground } from "@/components/AmbientBackground";
@@ -42,8 +42,15 @@ export const metadata: Metadata = {
   },
 };
 
-const geist = Geist({
-  subsets: ["latin"],
+// Use the Geist woff2 files already bundled inside next — no network fetch needed.
+const geist = localFont({
+  src: [
+    {
+      path: "../../node_modules/next/dist/esm/next-devtools/server/font/geist-latin.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-geist-sans",
   display: "swap",
 });
