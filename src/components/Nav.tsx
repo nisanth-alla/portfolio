@@ -7,8 +7,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { profile } from "@/content/profile";
 
 const items = [
-  { label: "About", href: "#about", id: "about" },
   { label: "Journey", href: "#journey", id: "journey" },
+  { label: "About", href: "#about", id: "about" },
   { label: "Projects", href: "#projects", id: "projects" },
   { label: "GitHub", href: "#github", id: "github" },
   { label: "Research", href: "#research", id: "research" },
