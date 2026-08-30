@@ -6,7 +6,7 @@ export function Writing() {
   return (
     <SectionShell id="writing" tone="muted">
       <SectionHeading
-        index="09"
+       
         title="Technical Writing"
         subtitle="Short technical notes and explainers from my learning journey."
       />

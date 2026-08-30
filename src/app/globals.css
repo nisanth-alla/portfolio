@@ -10,36 +10,36 @@
   --color-border: var(--border);
   --color-card: var(--card);
   --color-accent: var(--accent);
-  --color-accent-secondary: var(--accent-secondary);
   --color-accent-foreground: var(--accent-fg);
+  --color-now: var(--now);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --muted: #f1f5f9;
-  --muted-fg: #64748b;
-  --border: #e2e8f0;
+  --bg: #f7f8fa;
+  --fg: #0d1117;
+  --muted: #eef0f4;
+  --muted-fg: #5e6a7a;
+  --border: #dde1e9;
   --card: #ffffff;
-  --accent: #6366f1;
-  --accent-secondary: #0ea5e9;
+  --accent: #5b6cf9;
   --accent-fg: #ffffff;
-  --grid-dot: #cbd5e1;
+  --now: #d97706;
+  --grid-dot: #c8ced9;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #030712;
-  --fg: #f8fafc;
-  --muted: #111827;
-  --muted-fg: #94a3b8;
-  --border: #1e293b;
-  --card: #0f172a;
-  --accent: #818cf8;
-  --accent-secondary: #38bdf8;
-  --accent-fg: #0f172a;
-  --grid-dot: #1e293b;
+  --bg: #040810;
+  --fg: #e8edf5;
+  --muted: #0d1320;
+  --muted-fg: #8896aa;
+  --border: #192133;
+  --card: #0a1020;
+  --accent: #7c8cf8;
+  --accent-fg: #040810;
+  --now: #fbbf24;
+  --grid-dot: #192133;
   color-scheme: dark;
 }
 
@@ -182,7 +182,32 @@ body {
   background: color-mix(in oklab, var(--muted) 45%, transparent);
 }
 
+/* ── Signature element: left-rule on section headings ── */
+.section-rule {
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent);
+}
+
+/* ── Now indicator ── */
+.now-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--now);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--now) 25%, transparent);
+  animation: pulse-now 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-now {
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in oklab, var(--now) 25%, transparent); }
+  50%       { box-shadow: 0 0 0 6px color-mix(in oklab, var(--now) 10%, transparent); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .now-dot { animation: none; }
+
   .scroll-reveal[data-reveal="true"]:not([data-visible="true"]) {
     opacity: 1;
     transform: none;

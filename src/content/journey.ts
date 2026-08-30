@@ -12,16 +12,21 @@ export const journey: Milestone[] = [
   {
     year: "2024",
     description:
-      "Began leading frontend initiatives while working across production systems, on-call engineering, and cross-functional teams.",
+      "Began leading frontend initiatives while working across production systems, on-call engineering, and cross-functional teams at Uber Freight.",
+  },
+  {
+    year: "2025",
+    description:
+      "Started FoxPilot — a local-first job discovery tool built out of frustration with search tools that produce noise instead of signal. Now in beta, being hardened toward a real product. Also started SyncMark after noticing that no bookmark sync tool understands the concept of browser profiles — built the sync engine, URL normaliser, and MV3 extension from scratch.",
   },
   {
     year: "2026",
     description:
-      "Expanded into cloud infrastructure, backend systems, and distributed systems through deliberate learning and projects.",
+      "Expanding into cloud infrastructure, distributed systems, and backend architecture through deliberate projects and study — deepening the system-level understanding that production work demands.",
   },
   {
     year: "Next",
     description:
-      "Pursuing advanced study and engineering opportunities focused on large-scale software systems.",
+      "Pursuing engineering roles and opportunities where the work involves large-scale systems, product depth, and problems worth solving.",
   },
 ];

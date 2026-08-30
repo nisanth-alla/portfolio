@@ -6,7 +6,7 @@ export function EngineeringJourney() {
   return (
     <SectionShell id="journey" tone="muted">
       <SectionHeading
-        index="01"
+       
         title="Engineering Journey"
         subtitle="A concise timeline of how my work and learning have evolved."
       />

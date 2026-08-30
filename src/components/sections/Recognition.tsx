@@ -7,7 +7,7 @@ import { recognition } from "@/content/recognition";
 export function Recognition() {
   return (
     <SectionShell tone="muted">
-      <SectionHeading index="08" title="Recognition" />
+      <SectionHeading title="Recognition" />
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         {recognition.map((award) => (

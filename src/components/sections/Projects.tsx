@@ -7,7 +7,7 @@ export function Projects() {
   return (
     <SectionShell id="projects">
       <SectionHeading
-        index="04"
+       
         title="Featured Projects"
         subtitle="Selected work that shows how I think, build, and document engineering ideas."
       />

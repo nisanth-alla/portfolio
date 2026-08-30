@@ -22,7 +22,7 @@ export const profile = {
   email: "nisanth.alla@gmail.com",
   emailLink: "mailto:nisanth.alla@gmail.com",
   resume: "/resume.pdf",
-  now: "Building full-stack features, studying system design, and documenting what I learn in public repos.",
+  now: "Shipping FoxPilot from beta toward a user-ready product, building SyncMark's cross-browser sync engine, and deepening backend and systems knowledge alongside.",
   highlights: [
     { label: "Primary stack", value: "React · TypeScript · Node.js" },
     { label: "Growing into", value: "Cloud · distributed systems · backend design" },

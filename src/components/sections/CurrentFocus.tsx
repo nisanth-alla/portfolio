@@ -5,7 +5,7 @@ import { profile } from "@/content/profile";
 export function CurrentFocus() {
   return (
     <SectionShell tone="muted">
-      <SectionHeading index="03" title="Current Focus" />
+      <SectionHeading title="Current Focus" />
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
         {profile.focus.map((item) => (
           <li key={item} className="card-surface flex gap-3 p-4 text-sm leading-6 text-muted-foreground">

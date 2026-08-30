@@ -27,13 +27,18 @@ function NavLinks({ active }: { active: string | null }) {
               href={item.href}
               aria-current={isActive ? "true" : undefined}
               className={
-                "block whitespace-nowrap border-b-2 pb-1 transition " +
+                "relative block whitespace-nowrap py-1 transition-colors " +
                 (isActive
-                  ? "border-foreground font-medium text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground")
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground")
               }
             >
               {item.label}
+              <span
+                aria-hidden
+                className="absolute inset-x-0 -bottom-0.5 h-px origin-left bg-foreground transition-transform duration-200"
+                style={{ transform: isActive ? "scaleX(1)" : "scaleX(0)" }}
+              />
             </a>
           </li>
         );

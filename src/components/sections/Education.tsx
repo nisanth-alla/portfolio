@@ -5,7 +5,7 @@ import { education } from "@/content/education";
 export function Education() {
   return (
     <SectionShell id="education">
-      <SectionHeading index="07" title="Education" />
+      <SectionHeading title="Education" />
 
       <div className="mt-8 space-y-4">
         {education.map((item) => (
