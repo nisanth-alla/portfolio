@@ -9,11 +9,10 @@ import { profile } from "@/content/profile";
 export function Contact() {
   return (
     <SectionShell id="contact">
-      <div className="card-surface max-w-2xl p-8">
+      <div className="max-w-xl">
         <SectionHeading
-          index="10"
           title="Contact"
-          subtitle="Open to thoughtful conversations about engineering work, collaboration, and learning."
+          subtitle="If you're hiring, collaborating, or just want to talk about systems — email is the fastest way in."
         />
 
         <div className="mt-6 flex flex-col gap-3">

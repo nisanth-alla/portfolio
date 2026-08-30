@@ -36,13 +36,10 @@ const MONTH_LABELS = [
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
 
 function levelColor(level: number, isDark: boolean): string {
-  const shades = [
-    isDark ? "#1e293b" : "#e2e8f0",
-    isDark ? "#164e63" : "#99f6e4",
-    isDark ? "#0e7490" : "#5eead4",
-    isDark ? "#0891b2" : "#2dd4bf",
-    isDark ? "#0d9488" : "#14b8a6",
-  ];
+  // Five indigo shades that track the site accent (#5b6cf9 light / #7c8cf8 dark)
+  const shades = isDark
+    ? ["#192133", "#2d3a6b", "#3d4f9f", "#5b6cf9", "#7c8cf8"]
+    : ["#e8eaf6", "#c5c9f4", "#9ba2ef", "#6b74f0", "#5b6cf9"];
   return shades[level] ?? shades[0];
 }
 
@@ -134,9 +131,9 @@ export function GitHubActivity() {
   return (
     <SectionShell id="github">
       <SectionHeading
-        index="05"
+       
         title="GitHub Activity"
-        subtitle="My personal and open-source building record, straight from GitHub. The day-to-day, proprietary work I can't share publicly is captured in the journey and recognition sections instead."
+        subtitle="Personal and open-source commits only — the proprietary work lives in the journey section."
       />
 
       <div className="mt-8 card-surface p-6">

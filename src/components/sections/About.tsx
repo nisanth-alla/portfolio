@@ -8,7 +8,7 @@ export function About() {
     <SectionShell id="about">
       <div className="grid gap-10 md:grid-cols-2">
         <div>
-          <SectionHeading index="02" title="About" />
+          <SectionHeading title="About" />
           <p className="mt-4 text-base leading-7 text-muted-foreground">{about.bio}</p>
           <p className="mt-4 text-sm text-muted-foreground">
             Based in {profile.location}.
@@ -16,7 +16,7 @@ export function About() {
         </div>
 
         <div className="card-surface p-6 md:p-8">
-          <SectionHeading title="Engineering Philosophy" />
+          <SectionHeading title="Engineering philosophy" ruled={false} />
           <p className="mt-4 text-base leading-7 text-muted-foreground">
             {about.philosophy}
           </p>

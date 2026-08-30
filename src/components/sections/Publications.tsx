@@ -6,7 +6,7 @@ export function Publications() {
   return (
     <SectionShell id="research" tone="muted">
       <SectionHeading
-        index="06"
+       
         title="Research & Publications"
         subtitle="Research work spanning applied embedded systems and deep learning for Indic-language OCR."
       />
