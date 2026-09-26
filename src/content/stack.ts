@@ -1,0 +1,23 @@
+/** Tools used across the projects on this site — shown in the marquee band. */
+export const toolbelt = [
+  "typescript",
+  "react",
+  "next.js",
+  "node.js",
+  "go",
+  "python",
+  "fastapi",
+  "java",
+  "spring boot",
+  "postgresql",
+  "sqlite",
+  "docker",
+  "playwright",
+  "tailwind css",
+  "astro",
+  "vite",
+  "turborepo",
+  "ollama",
+  "onnx runtime",
+  "websockets",
+];

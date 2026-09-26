@@ -1,121 +1,119 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+import { profile } from "@/content/profile";
+import type { Contribution } from "@/lib/contributions";
+import {
+  GITHUB_USER_AGENT,
+  cacheHeaders,
+  errorMessage,
+  fetchWithTimeout,
+  githubHeaders,
+} from "@/lib/server/http";
 
-type Contribution = { date: string; count: number; level: number };
-type ContributionResponse = {
+type ContributionData = {
   total: Record<string, number>;
   contributions: Contribution[];
 };
 
-/** Hard timeout via Promise.race — AbortController alone doesn't interrupt
- *  undici's DNS/connection phase in all environments. */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms),
-    ),
-  ]);
+const MAX_YEARS = 3;
+const TIMEOUT_MS = 5000;
+
+function isContribution(value: unknown): value is Contribution {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.date === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(v.date) &&
+    typeof v.count === "number" &&
+    typeof v.level === "number"
+  );
 }
 
-/** Primary source: jogruber community API — returns date, count, level. */
-async function fromJogruber(username: string): Promise<ContributionResponse> {
-  const res = await withTimeout(
-    fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}`, {
-      headers: { "User-Agent": "portfolio-nisanth-alla" },
-    }),
-    5000,
+/**
+ * Primary source: the community contributions API (date, count, level).
+ * Third-party host, so it never receives the GitHub token.
+ */
+async function fromContributionsApi(username: string): Promise<Contribution[]> {
+  const res = await fetchWithTimeout(
+    `https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}`,
+    { headers: { "User-Agent": GITHUB_USER_AGENT } },
+    TIMEOUT_MS,
   );
-  if (!res.ok) throw new Error(`jogruber ${res.status}`);
-  return res.json() as Promise<ContributionResponse>;
+  if (!res.ok) throw new Error(`contributions API responded ${res.status}`);
+
+  const body: unknown = await res.json();
+  const list = (body as { contributions?: unknown }).contributions;
+  if (!Array.isArray(list) || !list.every(isContribution)) {
+    throw new Error("contributions API returned an unexpected shape");
+  }
+  return list;
 }
 
-/** Fallback source: GitHub's native contributions HTML.
- *  Parses <td class="ContributionCalendar-day" data-date="…" data-level="…">.
- *  Count is unavailable here — we map level → approximate count for display. */
-async function fromGitHubHtml(username: string): Promise<ContributionResponse> {
-  const res = await withTimeout(
-    fetch(`https://github.com/users/${encodeURIComponent(username)}/contributions`, {
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "User-Agent": "portfolio-nisanth-alla",
-      },
-    }),
-    5000,
+/**
+ * Fallback source: GitHub's own contribution calendar HTML. Only levels are
+ * available there, so counts are approximated from the level for display.
+ */
+async function fromGitHubCalendar(username: string): Promise<Contribution[]> {
+  const res = await fetchWithTimeout(
+    `https://github.com/users/${encodeURIComponent(username)}/contributions`,
+    { headers: githubHeaders({ "X-Requested-With": "XMLHttpRequest" }) },
+    TIMEOUT_MS,
   );
-  if (!res.ok) throw new Error(`github-html ${res.status}`);
+  if (!res.ok) throw new Error(`GitHub calendar responded ${res.status}`);
 
   const html = await res.text();
-
-  // Parse every ContributionCalendar-day cell
-  const cellRe = /data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"/g;
-  const contributions: Contribution[] = [];
-  let m: RegExpExecArray | null;
-
-  // level → representative count (used only when real count unavailable)
   const levelToCount = [0, 1, 3, 6, 10];
+  const cells = html.matchAll(/data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"/g);
+  const contributions = Array.from(cells, ([, date = "", level = "0"]) => ({
+    date,
+    count: levelToCount[Number(level)] ?? 0,
+    level: Number(level),
+  }));
 
-  while ((m = cellRe.exec(html)) !== null) {
-    const level = Number(m[2]);
-    contributions.push({
-      date: m[1],
-      count: levelToCount[level] ?? 0,
-      level,
-    });
+  if (!contributions.length) throw new Error("GitHub calendar markup had no day cells");
+  return contributions.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+const SOURCES = [
+  ["contributions-api", fromContributionsApi],
+  ["github-calendar", fromGitHubCalendar],
+] as const;
+
+/**
+ * GET /api/github?years=1..3
+ * Contribution calendar for the site owner only — deliberately not a
+ * general-purpose proxy for arbitrary usernames.
+ */
+export async function GET(request: NextRequest) {
+  const requested = Number.parseInt(request.nextUrl.searchParams.get("years") ?? "1", 10);
+  const years = Math.min(MAX_YEARS, Math.max(1, Number.isFinite(requested) ? requested : 1));
+
+  let contributions: Contribution[] | null = null;
+  for (const [name, load] of SOURCES) {
+    try {
+      contributions = await load(profile.handle);
+      break;
+    } catch (error) {
+      console.warn(`[api/github] ${name} failed: ${errorMessage(error)}`);
+    }
   }
 
-  if (!contributions.length) throw new Error("No cells parsed from GitHub HTML");
+  if (!contributions) {
+    return Response.json(
+      { error: "GitHub contributions are unavailable right now." },
+      { status: 502, headers: { "Cache-Control": "no-store" } },
+    );
+  }
 
-  contributions.sort((a, b) => a.date.localeCompare(b.date));
+  const earliestYear = new Date().getFullYear() - years + 1;
+  const recent = contributions.filter((c) => Number.parseInt(c.date.slice(0, 4), 10) >= earliestYear);
 
   const total: Record<string, number> = {};
-  for (const c of contributions) {
+  for (const c of recent) {
     const year = c.date.slice(0, 4);
     total[year] = (total[year] ?? 0) + c.count;
   }
 
-  return { total, contributions };
-}
-
-export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get("username") ?? "nisanth-alla";
-  const yearsParam = request.nextUrl.searchParams.get("years") ?? "1";
-  const years = Math.min(6, Math.max(1, Number.parseInt(yearsParam, 10) || 1));
-
-  let data: ContributionResponse | null = null;
-
-  // Try primary, then fallback
-  for (const fetch of [() => fromJogruber(username), () => fromGitHubHtml(username)]) {
-    try {
-      data = await fetch();
-      break;
-    } catch {
-      // try next source
-    }
-  }
-
-  if (!data) {
-    return Response.json(
-      { error: "Could not load GitHub contributions — both sources unavailable." },
-      { status: 502 },
-    );
-  }
-
-  const currentYear = new Date().getFullYear();
-  const earliestYear = currentYear - years + 1;
-
-  const recent = data.contributions.filter(
-    (c) => Number.parseInt(c.date.slice(0, 4), 10) >= earliestYear,
-  );
-
-  const totals: Record<string, number> = {};
-  for (const c of recent) {
-    const year = c.date.slice(0, 4);
-    totals[year] = (totals[year] ?? 0) + c.count;
-  }
-
-  return Response.json({ total: totals, contributions: recent });
+  const data: ContributionData = { total, contributions: recent };
+  return Response.json(data, { headers: cacheHeaders(3600) });
 }

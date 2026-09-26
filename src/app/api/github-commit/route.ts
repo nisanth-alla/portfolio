@@ -1,19 +1,19 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 300;
+import { profile } from "@/content/profile";
+import type { LatestCommit } from "@/lib/github-client";
+import { cacheHeaders, errorMessage, fetchWithTimeout, githubHeaders } from "@/lib/server/http";
 
-type GHEvent = {
+type PushEvent = {
   type: string;
   repo: { name: string };
-  payload: { commits?: { message: string }[] };
+  payload: { commits?: { message?: string }[] };
   created_at: string;
 };
 
-type LatestCommit = { message: string; repo: string; ago: string; url: string };
+const MAX_MESSAGE = 72;
 
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60_000);
+function timeAgo(iso: string, now = Date.now()): string {
+  const mins = Math.max(0, Math.floor((now - new Date(iso).getTime()) / 60_000));
+  if (!Number.isFinite(mins)) return "recently";
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
@@ -22,56 +22,57 @@ function timeAgo(iso: string): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
-function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    p,
-    new Promise<T>((_, rej) =>
-      setTimeout(() => rej(new Error(`Timeout after ${ms}ms`)), ms),
-    ),
-  ]);
+function isPushEvent(value: unknown): value is PushEvent {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    v.type === "PushEvent" &&
+    typeof v.created_at === "string" &&
+    typeof (v.repo as { name?: unknown } | undefined)?.name === "string"
+  );
 }
 
+/** GET /api/github-commit — the site owner's most recent public push. */
 export async function GET() {
   try {
-    const res = await withTimeout(
-      fetch("https://api.github.com/users/nisanth-alla/events/public?per_page=30", {
-        headers: { "User-Agent": "portfolio-nisanth-alla" },
-      }),
+    const res = await fetchWithTimeout(
+      `https://api.github.com/users/${encodeURIComponent(profile.handle)}/events/public?per_page=30`,
+      { headers: githubHeaders({ Accept: "application/vnd.github+json" }) },
       4000,
     );
 
     if (!res.ok) {
-      return Response.json({ error: "GitHub API error" }, { status: 502 });
+      console.warn(`[api/github-commit] GitHub responded ${res.status}`);
+      return Response.json(
+        { error: "GitHub is unavailable right now." },
+        { status: 502, headers: { "Cache-Control": "no-store" } },
+      );
     }
 
-    const events = (await res.json()) as GHEvent[];
-
-    // GitHub redacts commit messages for unauthenticated requests.
-    // Fall back to the most recent PushEvent regardless of commits payload.
-    const push = events.find((e) => e.type === "PushEvent");
+    const events: unknown = await res.json();
+    const push = Array.isArray(events) ? events.find(isPushEvent) : undefined;
 
     if (!push) {
-      return Response.json({ error: "No recent push events" }, { status: 404 });
+      return Response.json({ error: "No recent public pushes." }, { status: 404, headers: cacheHeaders(300) });
     }
 
-    // Use commit message if available, otherwise omit it
-    const rawMsg = push.payload.commits?.[0]?.message?.split("\n")[0] ?? "";
-    const message = rawMsg.length > 72 ? rawMsg.slice(0, 72) + "…" : rawMsg;
-
-    // Strip org prefix so both nisanth-alla/foo and foxpilot-jobs/foxpilot look clean
-    const repo = push.repo.name.includes("/")
-      ? push.repo.name.split("/").slice(-1)[0]
-      : push.repo.name;
+    // Unauthenticated requests may omit commit messages; the repo alone is still useful.
+    const firstLine = push.payload.commits?.[0]?.message?.split("\n")[0] ?? "";
+    const message = firstLine.length > MAX_MESSAGE ? `${firstLine.slice(0, MAX_MESSAGE)}…` : firstLine;
 
     const commit: LatestCommit = {
       message,
-      repo,
+      repo: push.repo.name.split("/").at(-1) ?? push.repo.name,
       ago: timeAgo(push.created_at),
       url: `https://github.com/${push.repo.name}`,
     };
 
-    return Response.json(commit);
-  } catch {
-    return Response.json({ error: "Unavailable" }, { status: 502 });
+    return Response.json(commit, { headers: cacheHeaders(300, 600) });
+  } catch (error) {
+    console.error(`[api/github-commit] ${errorMessage(error)}`);
+    return Response.json(
+      { error: "GitHub is unavailable right now." },
+      { status: 502, headers: { "Cache-Control": "no-store" } },
+    );
   }
 }

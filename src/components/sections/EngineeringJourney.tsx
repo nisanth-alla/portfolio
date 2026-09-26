@@ -1,47 +1,72 @@
-import { SectionHeading } from "@/components/SectionHeading";
-import { SectionShell } from "@/components/SectionShell";
+import type { CSSProperties } from "react";
+
+import { Fig } from "@/components/ui/Fig";
+import { Section, SectionHead } from "@/components/ui/Section";
 import { journey, type Milestone } from "@/content/journey";
+import { cn } from "@/lib/cn";
+import { shortHash } from "@/lib/hash";
 
-export function EngineeringJourney() {
+function Commit({ milestone, isHead }: { milestone: Milestone; isHead: boolean }) {
+  const isFuture = milestone.year === "Next";
+  const hash = shortHash(`${milestone.year}:${milestone.message}`);
+
   return (
-    <SectionShell id="journey" tone="muted">
-      <SectionHeading
-       
-        title="Engineering Journey"
-        subtitle="A concise timeline of how my work and learning have evolved."
-      />
-
-      <ol className="relative mt-10 max-w-2xl border-l border-border">
-        {journey.map((milestone) => (
-          <MilestoneItem key={milestone.year} milestone={milestone} />
-        ))}
-      </ol>
-    </SectionShell>
+    <li className={cn("commit", isHead && "is-head", isFuture && "is-future")}>
+      <span className="commit-node" aria-hidden />
+      <div className="min-w-0">
+        <p className="commit-head m-0">
+          <span className="commit-hash" aria-hidden>
+            {isFuture ? "·······" : hash}
+          </span>
+          {isHead ? <span className="ref is-head">HEAD → main</span> : null}
+          {isFuture ? (
+            <span className="ref">origin/next</span>
+          ) : (
+            <span className="ref is-tag">tag: {milestone.year}</span>
+          )}
+          <span className="commit-msg">
+            <span className={cn("commit-type", milestone.type)}>
+              {milestone.type}
+              {milestone.scope ? `(${milestone.scope})` : ""}:
+            </span>{" "}
+            {milestone.message}
+          </span>
+        </p>
+        <p className="commit-body">
+          <span className="sr-only">{isFuture ? "Next: " : `${milestone.year}: `}</span>
+          {milestone.description}
+        </p>
+      </div>
+    </li>
   );
 }
 
-function MilestoneItem({ milestone }: { milestone: Milestone }) {
-  const isFuture = milestone.year === "Next";
+export function EngineeringJourney() {
+  const headIndex = journey.findLastIndex((m) => m.year !== "Next");
 
   return (
-    <li className="relative pb-10 pl-10 last:pb-0">
-      <span
-        aria-hidden="true"
-        className={
-          "absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full " +
-          (isFuture
-            ? "border-2 border-foreground bg-background"
-            : "bg-foreground")
+    <Section id="journey">
+      <SectionHead
+        id="journey"
+        title={
+          <>
+            Experience <span className="dim">as a git log</span>
+          </>
         }
+        lede="Oldest first. HEAD is where I am now, and the dashed branch is where I'm heading."
       />
-
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-        {milestone.year}
-      </p>
-
-      <p className="mt-2 text-base leading-7 text-foreground/90">
-        {milestone.description}
-      </p>
-    </li>
+      <div data-reveal-item style={{ "--i": 1 } as CSSProperties}>
+        <Fig title="git log --graph --reverse" icon="⎇">
+          <div className="relative">
+            <span className="gitlog-rail" aria-hidden />
+            <ol className="gitlog">
+              {journey.map((milestone, i) => (
+                <Commit key={milestone.year} milestone={milestone} isHead={i === headIndex} />
+              ))}
+            </ol>
+          </div>
+        </Fig>
+      </div>
+    </Section>
   );
 }
