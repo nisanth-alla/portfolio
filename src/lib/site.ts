@@ -2,7 +2,7 @@ export const site = {
   name: "Nisanth A",
   title: "Nisanth A | Software Engineer",
   description:
-    "Software Engineer portfolio — full-stack development, distributed systems, cloud engineering, and research in applied systems and ML.",
+    "Nisanth A is a software engineer in Hyderabad working on React and TypeScript in production, plus local-first tools and distributed systems experiments.",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
     "https://portfolio-ulzg.vercel.app",

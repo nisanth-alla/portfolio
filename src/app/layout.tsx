@@ -1,11 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import { AmbientBackground } from "@/components/AmbientBackground";
-import { PersonJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
-import { StickyLocalTimeBar } from "@/components/StickyLocalTimeBar";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { CommandPalette } from "@/components/chrome/CommandPalette";
+import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
+import { Dock } from "@/components/chrome/Dock";
+import { SpotlightTracker } from "@/components/chrome/SpotlightTracker";
+import { PersonJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
+import { SoundProvider } from "@/components/providers/SoundProvider";
+import { UiProvider } from "@/components/providers/UiProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { themeInitScript } from "@/lib/theme";
 import { site } from "@/lib/site";
 
@@ -42,6 +47,14 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f2ec" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f0e" },
+  ],
+  colorScheme: "light dark",
+};
+
 // Use the Geist woff2 files already bundled inside next — no network fetch needed.
 const geist = localFont({
   src: [
@@ -55,26 +68,52 @@ const geist = localFont({
   display: "swap",
 });
 
+const geistMono = localFont({
+  src: [
+    {
+      path: "../../node_modules/next/dist/esm/next-devtools/server/font/geist-mono-latin.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-geist-mono",
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <PersonJsonLd />
         <WebSiteJsonLd />
       </head>
-      <body className={`${geist.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
         <ThemeProvider>
-          <AmbientBackground />
-          {children}
-          <StickyLocalTimeBar />
+          <SoundProvider>
+            <UiProvider>
+              {children}
+              <ErrorBoundary name="dock">
+                <Dock />
+              </ErrorBoundary>
+              <ErrorBoundary name="command-palette">
+                <CommandPalette />
+              </ErrorBoundary>
+              <SpotlightTracker />
+              <ConsoleGreeting />
+            </UiProvider>
+          </SoundProvider>
         </ThemeProvider>
         <SpeedInsights />
       </body>

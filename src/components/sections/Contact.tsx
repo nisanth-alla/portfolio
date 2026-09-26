@@ -1,69 +1,75 @@
-import { Mail } from "lucide-react";
+import type { CSSProperties } from "react";
 
-import { GithubIcon, LinkedinIcon } from "@/components/BrandIcons";
-import { CopyEmailButton } from "@/components/CopyEmailButton";
-import { SectionHeading } from "@/components/SectionHeading";
-import { SectionShell } from "@/components/SectionShell";
+import { CopyButton } from "@/components/ui/CopyButton";
+import { Fig, LiveChip } from "@/components/ui/Fig";
+import { Section, SectionHead } from "@/components/ui/Section";
 import { profile } from "@/content/profile";
+
+const card: Array<[string, string]> = [
+  ["email", profile.email],
+  ["linkedin", "in/nisanth-alla"],
+  ["github", profile.handle],
+  ["based_in", `${profile.city}, India`],
+  ["timezone", `${profile.timezoneLabel} (UTC+5:30)`],
+  ["open_to", "new opportunities"],
+];
 
 export function Contact() {
   return (
-    <SectionShell id="contact">
-      <div className="max-w-xl">
-        <SectionHeading
-          title="Contact"
-          subtitle="If you're hiring, collaborating, or just want to talk about systems — email is the fastest way in."
-        />
-
-        <div className="mt-6 flex flex-col gap-3">
-          <a
-            href={profile.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-              <LinkedinIcon className="h-4 w-4 text-foreground" />
-            </span>
-            <span className="font-medium text-foreground">LinkedIn</span>
-            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
-              {profile.linkedin.replace("https://www.", "").replace(/\/$/, "")}
-            </span>
-          </a>
-
-          <a
-            href={profile.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-              <GithubIcon className="h-4 w-4 text-foreground" />
-            </span>
-            <span className="font-medium text-foreground">GitHub</span>
-            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
-              {profile.github.replace("https://", "").replace(/\/$/, "")}
-            </span>
-          </a>
-
-          <a
-            href={profile.emailLink}
-            className="group flex items-center gap-3 rounded-xl border border-border p-3 text-sm transition hover:border-accent/40 hover:bg-muted"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-              <Mail className="h-4 w-4 text-foreground" />
-            </span>
-            <span className="font-medium text-foreground">Email</span>
-            <span className="ml-auto text-muted-foreground transition group-hover:text-foreground">
-              {profile.email}
-            </span>
-          </a>
+    <Section id="contact">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
+        <div>
+          <SectionHead
+            id="contact"
+            title={
+              <>
+                Let&apos;s <span className="mark">talk</span>.
+              </>
+            }
+            lede="I'm open to new roles and collaborations. Email is the quickest way to reach me."
+            className="mb-0"
+          />
+          <div className="mt-8 flex flex-wrap gap-3" data-reveal-item style={{ "--i": 1 } as CSSProperties}>
+            <a href={profile.emailLink} className="btn btn-primary">
+              Email me <span className="arrow" aria-hidden>→</span>
+            </a>
+            <CopyButton value={profile.email} label="Copy email" copiedLabel="Copied ✓" size="md" />
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+              LinkedIn ↗
+            </a>
+            <a href={profile.resume} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+              Résumé ↓
+            </a>
+          </div>
         </div>
 
-        <div className="mt-6">
-          <CopyEmailButton />
+        <div data-reveal-item style={{ "--i": 2 } as CSSProperties}>
+          <Fig
+            title="contact.json"
+            icon="{}"
+            className="spot"
+            meta={<LiveChip label={`${profile.city} · ${profile.timezoneLabel}`} />}
+          >
+            <pre className="code m-0 px-5 py-5 text-[13px]" tabIndex={0} aria-label="Contact details as JSON">
+              <code>
+                <span className="tok-p">{"{"}</span>
+                {"\n"}
+                {card.map(([key, value], i) => (
+                  <span key={key}>
+                    {"  "}
+                    <span className="tok-k">&quot;{key}&quot;</span>
+                    <span className="tok-p">: </span>
+                    <span className="tok-s">&quot;{value}&quot;</span>
+                    <span className="tok-p">{i < card.length - 1 ? "," : ""}</span>
+                    {"\n"}
+                  </span>
+                ))}
+                <span className="tok-p">{"}"}</span>
+              </code>
+            </pre>
+          </Fig>
         </div>
       </div>
-    </SectionShell>
+    </Section>
   );
 }
