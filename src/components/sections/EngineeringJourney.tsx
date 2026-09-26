@@ -70,3 +70,33 @@ export function EngineeringJourney() {
     </Section>
   );
 }
+
+export function EngineeringJourney() {
+  const headIndex = journey.findLastIndex((m) => m.year !== "Next");
+
+  return (
+    <Section id="journey">
+      <SectionHead
+        id="journey"
+        title={
+          <>
+            Experience <span className="dim">as a git log</span>
+          </>
+        }
+        lede="Oldest first. HEAD is where I am now, and the dashed branch is where I'm heading."
+      />
+      <div data-reveal-item style={{ "--i": 1 } as CSSProperties}>
+        <Fig title="git log --graph --reverse" icon="⎇">
+          <div className="relative">
+            <span className="gitlog-rail" aria-hidden />
+            <ol className="gitlog">
+              {journey.map((milestone, i) => (
+                <Commit key={milestone.year} milestone={milestone} isHead={i === headIndex} />
+              ))}
+            </ol>
+          </div>
+        </Fig>
+      </div>
+    </Section>
+  );
+}
